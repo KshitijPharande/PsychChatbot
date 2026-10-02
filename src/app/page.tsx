@@ -17,7 +17,9 @@ import {
   Globe,
   Lock,
   Info,
-  EyeOff
+  EyeOff,
+  RotateCcw,
+  Wind
 } from 'lucide-react';
 
 // Client-side regex for rapid crisis keyword detection (zero-latency safety fallback)
@@ -154,14 +156,14 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen w-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 bg-grid-pattern text-slate-100 font-sans relative">
+    <div className="flex-1 min-h-0 w-full flex flex-col lg:flex-row overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 bg-grid-pattern text-slate-100 font-sans relative">
       
       {/* Ambient background decorative glow circles */}
       <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute bottom-1/4 -right-32 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[140px] pointer-events-none" />
 
-      {/* Left Sidebar (The Sanctuary/Personal Grounding Space) */}
-      <aside className="w-full lg:w-80 shrink-0 border-b lg:border-b-0 lg:border-r border-slate-900 bg-slate-950/40 backdrop-blur-xl flex flex-col p-6 overflow-y-auto relative z-10 justify-between gap-6">
+      {/* Left Sidebar (The Sanctuary/Personal Grounding Space - Desktop Only) */}
+      <aside className="hidden lg:flex lg:w-80 shrink-0 border-r border-slate-900 bg-slate-950/40 backdrop-blur-xl flex-col p-6 overflow-y-auto relative z-10 justify-between gap-6">
         
         {/* Top: Logo & Description */}
         <div className="space-y-6">
@@ -220,14 +222,60 @@ export default function Home() {
         </div>
       </aside>
 
-      {/* Main Chat Panel */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden p-4 lg:p-6 relative z-10">
+      {/* Main Chat Panel - Full screen on Mobile, Flexible on Desktop */}
+      <main className="flex-1 min-h-0 flex flex-col h-full overflow-hidden p-2 sm:p-4 lg:p-6 relative z-10">
         
         {/* Chat Sanctuary Panel Wrapper */}
-        <div className="flex-1 flex flex-col bg-slate-900/35 border border-slate-800/65 rounded-3xl overflow-hidden shadow-2xl relative backdrop-blur-md">
+        <div className="flex-1 min-h-0 flex flex-col bg-slate-900/35 border border-slate-800/65 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl relative backdrop-blur-md">
           
           {/* Internal background gradient overlay inside card */}
           <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none" />
+
+          {/* Header inside Chat Panel */}
+          <div className="px-3.5 py-2.5 sm:px-5 sm:py-3 border-b border-slate-800/60 bg-slate-950/60 backdrop-blur-md flex items-center justify-between shrink-0 relative z-20">
+            <div className="flex items-center gap-2 sm:gap-2.5">
+              <div className="relative flex items-center justify-center">
+                <div className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-emerald-400" />
+                <div className="absolute w-3.5 sm:w-4 h-3.5 sm:h-4 rounded-full bg-emerald-500/30 animate-ping" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs sm:text-sm font-bold text-slate-100">Haven</span>
+                  <span className="text-[9px] sm:text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.2 rounded-full font-medium">
+                    Sanctuary
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-400 hidden sm:block">Private, empathetic listener</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowManualResources(!showManualResources);
+                  setActiveRegion('IN');
+                }}
+                className="flex items-center gap-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/25 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] font-semibold transition cursor-pointer"
+                title="Emergency Helplines"
+              >
+                <Phone className="w-3 h-3 text-amber-400" />
+                <span>Helplines</span>
+              </button>
+
+              {messages.length > 0 && (
+                <button
+                  type="button"
+                  onClick={clearChat}
+                  className="flex items-center gap-1 bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800/80 px-2.5 py-1.5 rounded-full text-[11px] transition cursor-pointer"
+                  title="Clear conversation"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  <span className="hidden sm:inline">Clear</span>
+                </button>
+              )}
+            </div>
+          </div>
           
           {/* Manual Helpline Panel Overlay inside chat panel */}
           <AnimatePresence>
@@ -339,7 +387,7 @@ export default function Home() {
           </AnimatePresence>
 
           {/* Conversation Feed container */}
-          <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+          <div className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-5 lg:p-6 space-y-4 sm:space-y-6 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
             <AnimatePresence initial={false}>
               {messages.length === 0 ? (
                 /* Welcome panel */
@@ -349,35 +397,49 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -15 }}
                   transition={{ duration: 0.4 }}
-                  className="h-full flex flex-col justify-center py-8"
+                  className="min-h-full flex flex-col justify-center py-3 sm:py-6"
                 >
-                  <div className="max-w-xl mx-auto space-y-8 text-center sm:text-left">
-                    <div className="space-y-3">
-                      <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-emerald-400 tracking-tight">
+                  <div className="max-w-xl mx-auto space-y-4 sm:space-y-6 text-center sm:text-left w-full">
+                    <div className="space-y-2 sm:space-y-3">
+                      <h2 className="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-emerald-400 tracking-tight">
                         You are not alone.
                       </h2>
-                      <p className="text-sm text-slate-400 leading-relaxed max-w-lg">
+                      <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-lg mx-auto sm:mx-0">
                         I am Haven, your private, empathetic AI space. Speak freely, vent, or share whatever feelings are weighing down on you. I am here to hold space for you.
                       </p>
                     </div>
 
-                    <div className="space-y-4">
+                    {/* Mobile Breathing guide banner */}
+                    <div className="lg:hidden">
+                      <a
+                        href="/breathing"
+                        className="inline-flex items-center justify-between w-full bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/20 px-3.5 py-2.5 rounded-xl text-xs text-emerald-300 font-medium transition"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Wind className="w-3.5 h-3.5 text-emerald-400" />
+                          Feeling overwhelmed? Try Breathing Guide
+                        </span>
+                        <ChevronRight className="w-3.5 h-3.5 text-emerald-400" />
+                      </a>
+                    </div>
+
+                    <div className="space-y-2.5 sm:space-y-3">
                       <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 justify-center sm:justify-start uppercase tracking-widest">
-                        <MessageCircle className="w-4 h-4 text-emerald-450" /> Suggestions to start
+                        <MessageCircle className="w-3.5 h-3.5 text-emerald-400" /> Suggestions to start
                       </div>
                       
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                         {suggestions.map((suggestion, idx) => (
                           <motion.button
                             key={idx}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 * idx, duration: 0.35 }}
+                            transition={{ delay: 0.08 * idx, duration: 0.3 }}
                             onClick={() => handleSuggestionClick(suggestion)}
-                            className="text-left text-xs bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800/80 hover:border-emerald-500/25 p-4 rounded-2xl transition-all duration-300 text-slate-350 hover:text-white cursor-pointer flex justify-between items-center shadow-sm group hover:-translate-y-0.5"
+                            className="text-left text-xs bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800/80 hover:border-emerald-500/25 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl transition-all duration-200 text-slate-300 hover:text-white cursor-pointer flex justify-between items-center shadow-sm group"
                           >
                             <span>{suggestion}</span>
-                            <ChevronRight className="w-4 h-4 text-slate-655 group-hover:text-emerald-450 transition shrink-0 ml-2" />
+                            <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-emerald-400 transition shrink-0 ml-2" />
                           </motion.button>
                         ))}
                       </div>
@@ -596,7 +658,7 @@ export default function Home() {
           </div>
 
           {/* Floating Footer Form */}
-          <footer className="p-4 border-t border-slate-800/40 bg-slate-950/20 backdrop-blur-md shrink-0">
+          <footer className="p-2.5 sm:p-4 border-t border-slate-800/40 bg-slate-950/60 backdrop-blur-md shrink-0 pb-[max(0.625rem,env(safe-area-inset-bottom))]">
             <form onSubmit={handleFormSubmit} className="space-y-2 relative">
               <div className="flex gap-2">
                 <input
@@ -604,14 +666,14 @@ export default function Home() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder={localCrisisTriggered ? "Type to continue chatting..." : "Type how you are feeling or what's on your mind..."}
-                  className="flex-1 bg-slate-900/60 hover:bg-slate-850/80 focus:bg-slate-900/90 border border-slate-800/80 focus:border-slate-700/80 rounded-2xl px-4 py-3 text-xs sm:text-sm text-slate-100 placeholder-slate-500 outline-none transition focus:ring-1 focus:ring-emerald-500/20"
+                  className="flex-1 bg-slate-900/70 hover:bg-slate-850/80 focus:bg-slate-900 border border-slate-800/80 focus:border-emerald-500/40 rounded-xl sm:rounded-2xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-sm text-slate-100 placeholder-slate-500 outline-none transition focus:ring-1 focus:ring-emerald-500/20"
                   disabled={isLoading}
                   autoComplete="off"
                 />
                 <button
                   type="submit"
                   disabled={isLoading || !input.trim()}
-                  className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-900/80 text-white disabled:text-slate-600 border border-transparent disabled:border-slate-850 rounded-2xl px-5 py-3 transition flex items-center justify-center cursor-pointer shrink-0"
+                  className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-900 text-white disabled:text-slate-600 border border-transparent disabled:border-slate-800/80 rounded-xl sm:rounded-2xl px-4 sm:px-5 py-2.5 sm:py-3 transition flex items-center justify-center cursor-pointer shrink-0"
                 >
                   <Send className="w-4 h-4" />
                 </button>
@@ -619,10 +681,10 @@ export default function Home() {
               
               <div className="flex items-center justify-between text-[10px] text-slate-500 px-1 relative z-10">
                 <span className="flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-slate-600 animate-pulse" /> Groq Llama 3.3 70B
+                  <Sparkles className="w-3 h-3 text-emerald-400" /> Powered by Groq Cloud
                 </span>
                 <span className="flex items-center gap-1">
-                  <Lock className="w-2.5 h-2.5 text-slate-600" /> Secure chat environment
+                  <Lock className="w-2.5 h-2.5 text-slate-500" /> Private session
                 </span>
               </div>
             </form>

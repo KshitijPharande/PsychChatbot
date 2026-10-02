@@ -8,8 +8,8 @@ export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav className="w-full flex justify-center pt-5 px-4 relative z-50 shrink-0">
-      <div className="flex items-center gap-6 px-6 py-2.5 rounded-full border border-slate-800/80 bg-slate-900/65 backdrop-blur-xl shadow-lg shadow-black/35 select-none">
+    <nav className="w-full flex justify-center pt-2.5 pb-1 sm:pt-4 sm:pb-2 px-3 sm:px-4 relative z-50 shrink-0">
+      <div className="flex items-center gap-4 sm:gap-6 px-4 sm:px-6 py-2 rounded-full border border-slate-800/80 bg-slate-900/75 backdrop-blur-xl shadow-lg shadow-black/35 select-none">
         <Link 
           href="/" 
           className={`flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider transition-colors duration-200 cursor-pointer ${

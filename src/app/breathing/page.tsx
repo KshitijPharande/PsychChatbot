@@ -65,7 +65,7 @@ export default function BreathingPage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col justify-center items-center p-4 md:p-8 relative min-h-[calc(100vh-80px)] overflow-hidden">
+    <div className="flex-1 min-h-0 w-full flex flex-col justify-center items-center p-4 md:p-8 relative overflow-y-auto">
       
       {/* Ambient background glows */}
       <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[140px] pointer-events-none" />
