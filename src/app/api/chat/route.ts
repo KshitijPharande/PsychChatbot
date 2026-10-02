@@ -11,9 +11,10 @@ export async function POST(req: Request) {
     // Convert UIMessages to standard ModelMessages format
     const modelMessages = await convertToModelMessages(messages);
 
-    // Use Groq Llama 3.3 70B for blazing-fast, high-quality, empathetic responses
+    // Use active Groq model (openai/gpt-oss-120b or configurable via GROQ_MODEL)
+    const modelName = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
     const result = await streamText({
-      model: groq('llama-3.3-70b-versatile'),
+      model: groq(modelName),
       messages: modelMessages,
       system: `You are Haven, a deeply compassionate, gentle, and empathetic mental health chatbot. 
 Your goal is to provide a warm, safe, non-judgmental space for users to vent, talk through their feelings, or share their day.
@@ -34,13 +35,14 @@ If the user expresses thoughts of suicide, self-harm, ending their life, or seve
     return result.toUIMessageStreamResponse({
       onError: (error: any) => {
         console.error('Streaming error caught:', error);
-        return 'An error occurred.';
+        return error?.message || 'An error occurred during response generation.';
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in chat API route:', error);
+    const errorMessage = error?.message || 'Failed to process chat request';
     return new Response(
-      JSON.stringify({ error: 'Failed to process chat request' }),
+      JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
